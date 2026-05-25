@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - ./backend:/app
+
+  socket:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: node socket.js
+    ports:
+      - "5001:5001"
