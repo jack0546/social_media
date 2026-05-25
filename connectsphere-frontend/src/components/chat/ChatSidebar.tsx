@@ -67,12 +67,34 @@ export default function ChatSidebar({
       );
       
       const unsub = onSnapshot(searchQuery, (snapshot) => {
-        const usersData = snapshot.docs
+        let usersData = snapshot.docs
           .filter(doc => doc.id !== userProfile?.uid)
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as User[];
+          .map(doc => ({ id: doc.id, ...doc.data() })) as User[];
+        
+        // If search looks like an email, also search by email
+        if (searchTerm.includes("@")) {
+          const emailQuery = query(
+            collection(db, "users"),
+            where("email", "==", searchTerm.toLowerCase()),
+            limit(10)
+          );
+          
+          onSnapshot(emailQuery, (emailSnapshot) => {
+            const emailUsers = emailSnapshot.docs
+              .filter(doc => doc.id !== userProfile?.uid)
+              .map(doc => ({ id: doc.id, ...doc.data() })) as User[];
+            
+            // Merge and deduplicate
+            const merged = [...usersData];
+            emailUsers.forEach(emailUser => {
+              if (!merged.find(u => u.id === emailUser.id)) {
+                merged.push(emailUser);
+              }
+            });
+            setUsers(merged);
+          });
+        }
+        
         setUsers(usersData);
       }, () => {});
 
