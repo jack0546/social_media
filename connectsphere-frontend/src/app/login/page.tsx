@@ -1,11 +1,10 @@
-"use client";
-
-import { useState } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,9 +19,11 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(email, password);
+      toast.success("Welcome back!");
       router.push("/feed");
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (error: any) {
+      const message = error.message || "Login failed";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -32,9 +33,11 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginWithGoogle();
+      toast.success("Welcome!");
       router.push("/feed");
-    } catch (error) {
-      console.error("Google login error:", error);
+    } catch (error: any) {
+      const message = error.message || "Google login failed";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

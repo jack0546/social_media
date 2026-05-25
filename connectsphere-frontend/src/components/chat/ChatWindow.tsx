@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot } from "firebase/firestore";
+import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Send, Paperclip, Smile, Phone, Video as VideoIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import EmojiPicker from "emoji-picker-react";
 
 interface Message {
@@ -19,9 +20,10 @@ export default function ChatWindow({ chatId }: { chatId: string | null }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const [chatPartner, setChatPartner] = useState<any>(null);
   const { userProfile } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!chatId) return;
@@ -40,8 +42,23 @@ export default function ChatWindow({ chatId }: { chatId: string | null }) {
       setMessages(messagesData);
     });
 
+    const chatDoc = doc(db, "chats", chatId);
+    getDoc(chatDoc).then(snap => {
+      if (snap.exists()) {
+        const data = snap.data();
+        const otherUserId = data?.participants?.find((p: string) => p !== userProfile?.uid);
+        if (otherUserId) {
+          getDoc(doc(db, "users", otherUserId)).then(userSnap => {
+            if (userSnap.exists()) {
+              setChatPartner(userSnap.data());
+            }
+          });
+        }
+      }
+    });
+
     return () => unsub();
-  }, [chatId]);
+  }, [chatId, userProfile?.uid]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,21 +100,25 @@ export default function ChatWindow({ chatId }: { chatId: string | null }) {
       <div className="p-4 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img
-            src="/user-avatar.png"
+            src={chatPartner?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(chatPartner?.displayName || "User")}&background=6366f1&color=fff`}
             alt="Chat partner"
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <p className="font-semibold text-white">Chat Partner</p>
-            <p className="text-sm text-gray-400">Online</p>
+            <p className="font-semibold text-white">{chatPartner?.displayName || "Chat Partner"}</p>
+            <p className="text-sm text-gray-400">{chatPartner?.isOnline ? "Online" : "Offline"}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-2 text-gray-400 hover:text-white">
-            <Phone className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-gray-400 hover:text-white">
+          <button 
+            onClick={() => router.push(`/video-call?calleeId=${chatPartner?.uid}&initiator=true`)}
+            className="p-2 text-gray-400 hover:text-white"
+            title="Video call"
+          >
             <VideoIcon className="w-5 h-5" />
+          </button>
+          <button className="p-2 text-gray-400 hover:text-white" title="Voice call">
+            <Phone className="w-5 h-5" />
           </button>
         </div>
       </div>

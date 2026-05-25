@@ -1,11 +1,10 @@
-"use client";
-
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -21,9 +20,11 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       await register(email, password, name);
+      toast.success("Account created! Check your email to verify.");
       router.push("/feed");
-    } catch (error) {
-      console.error("Register error:", error);
+    } catch (error: any) {
+      const message = error.message || "Registration failed";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
