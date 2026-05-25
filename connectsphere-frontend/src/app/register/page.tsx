@@ -23,7 +23,7 @@ export default function RegisterPage() {
     try {
       await register(email, password, name);
       toast.success("Account created! Check your email to verify.");
-      router.push("/feed");
+      router.push("/chat");
     } catch (error: any) {
       const message = error.message || "Registration failed";
       toast.error(message);

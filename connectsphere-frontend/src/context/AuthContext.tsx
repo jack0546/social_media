@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       await createUserDoc(cred.user);
       toast.success("Welcome back!");
-      router.push("/feed");
+      router.push("/chat");
     } catch (error: any) {
       console.error("Login error:", error);
       const message = error.message || "Login failed";
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await createUserDoc(cred.user, { displayName: name });
         await sendEmailVerification(cred.user);
         toast.success("Account created! Check your email to verify.");
-        router.push("/feed");
+        router.push("/chat");
       } catch (error: any) {
         console.error("Register error:", error);
         const message = error.message || "Registration failed";
@@ -154,7 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const cred = await signInWithPopup(auth, googleProvider);
       await createUserDoc(cred.user);
       toast.success(`Welcome, ${cred.user.displayName}!`);
-      router.push("/feed");
+      router.push("/chat");
     } catch (error: any) {
       console.error("Google login error:", error);
       const message = error.message || "Google login failed";

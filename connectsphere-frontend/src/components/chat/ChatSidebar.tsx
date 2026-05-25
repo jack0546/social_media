@@ -136,7 +136,7 @@ export default function ChatSidebar({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => setShowUserSearch(true)}
-            placeholder="Search users..."
+            placeholder="Enter email or username..."
             className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
           />
         </div>

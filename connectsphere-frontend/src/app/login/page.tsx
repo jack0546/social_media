@@ -21,7 +21,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(email, password);
-      router.push("/feed");
+      router.push("/chat");
     } catch (error: any) {
       const message = error.message || "Login failed";
       toast.error(message);
@@ -34,7 +34,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginWithGoogle();
-      router.push("/feed");
+      router.push("/chat");
     } catch (error: any) {
       const message = error.message || "Google login failed";
       toast.error(message);
