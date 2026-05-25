@@ -117,29 +117,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    await createUserDoc(cred.user);
-    toast.success("Welcome back!");
-    router.push("/feed");
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      await createUserDoc(cred.user);
+      toast.success("Welcome back!");
+      router.push("/feed");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      const message = error.message || "Login failed";
+      toast.error(message);
+      throw error;
+    }
   }, [router]);
 
   const register = useCallback(
     async (email: string, password: string, name: string) => {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(cred.user, { displayName: name });
-      await createUserDoc(cred.user, { displayName: name });
-      await sendEmailVerification(cred.user);
-      toast.success("Account created! Check your email to verify.");
-      router.push("/feed");
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+        await createUserDoc(cred.user, { displayName: name });
+        await sendEmailVerification(cred.user);
+        toast.success("Account created! Check your email to verify.");
+        router.push("/feed");
+      } catch (error: any) {
+        console.error("Register error:", error);
+        const message = error.message || "Registration failed";
+        toast.error(message);
+        throw error;
+      }
     },
     [router]
   );
 
   const loginWithGoogle = useCallback(async () => {
-    const cred = await signInWithPopup(auth, googleProvider);
-    await createUserDoc(cred.user);
-    toast.success(`Welcome, ${cred.user.displayName}!`);
-    router.push("/feed");
+    try {
+      const cred = await signInWithPopup(auth, googleProvider);
+      await createUserDoc(cred.user);
+      toast.success(`Welcome, ${cred.user.displayName}!`);
+      router.push("/feed");
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      const message = error.message || "Google login failed";
+      toast.error(message);
+      throw error;
+    }
   }, [router]);
 
   const logout = useCallback(async () => {
