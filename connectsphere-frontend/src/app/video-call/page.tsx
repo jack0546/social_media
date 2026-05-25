@@ -157,14 +157,6 @@ export default function VideoCallPage() {
           playsInline
           className="w-full h-full object-cover"
         />
-        {remoteStream && (
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        )}
         
         <div className="absolute bottom-4 right-4 w-48 h-36 rounded-lg overflow-hidden shadow-lg">
           <video

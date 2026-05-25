@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Send, Paperclip, Smile, Phone, Video as VideoIcon } from "lucide-react";
